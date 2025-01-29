@@ -1,1 +1,21 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #222;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin-top: 15%;
+}
+
+#hidden-link {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    color: transparent;
+    text-decoration: none;
+}
 
