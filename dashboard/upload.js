@@ -1,14 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
-    if (localStorage.getItem("loggedIn") !== "true") {
+    if (!localStorage.getItem("loggedIn")) {
         window.location.href = "../auth/login.html";
     }
-
     loadFiles();
 });
 
 function uploadFile() {
     const fileInput = document.getElementById("fileInput");
-    const fileList = document.getElementById("fileList");
 
     if (fileInput.files.length === 0) {
         alert("Please select a file to upload.");
@@ -16,43 +14,51 @@ function uploadFile() {
     }
 
     const file = fileInput.files[0];
-    const reader = new FileReader();
+    const storageRef = storage.ref('uploads/' + file.name);
+    
+    const uploadTask = storageRef.put(file);
 
-    reader.onload = function (e) {
-        const fileData = {
-            name: file.name,
-            content: e.target.result
-        };
-
-        let storedFiles = JSON.parse(localStorage.getItem("files")) || [];
-        storedFiles.push(fileData);
-        localStorage.setItem("files", JSON.stringify(storedFiles));
-
-        loadFiles();
-    };
-
-    reader.readAsDataURL(file);
+    uploadTask.on('state_changed',
+        (snapshot) => {
+            console.log("Uploading: " + snapshot.bytesTransferred);
+        },
+        (error) => {
+            console.error("Upload failed:", error);
+        },
+        () => {
+            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                db.collection("files").add({
+                    name: file.name,
+                    url: downloadURL,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                loadFiles();
+            });
+        }
+    );
 }
 
 function loadFiles() {
     const fileList = document.getElementById("fileList");
     fileList.innerHTML = "";
 
-    let storedFiles = JSON.parse(localStorage.getItem("files")) || [];
-
-    storedFiles.forEach((file, index) => {
-        let listItem = document.createElement("li");
-        listItem.innerHTML = `<a href="${file.content}" download="${file.name}">${file.name}</a>
-                              <button onclick="deleteFile(${index})">Delete</button>`;
-        fileList.appendChild(listItem);
+    db.collection("files").orderBy("timestamp", "desc").get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            const file = doc.data();
+            let listItem = document.createElement("li");
+            listItem.innerHTML = `<a href="${file.url}" target="_blank">${file.name}</a>
+                                  <button onclick="deleteFile('${doc.id}')">Delete</button>`;
+            fileList.appendChild(listItem);
+        });
     });
 }
 
-function deleteFile(index) {
-    let storedFiles = JSON.parse(localStorage.getItem("files")) || [];
-    storedFiles.splice(index, 1);
-    localStorage.setItem("files", JSON.stringify(storedFiles));
-    loadFiles();
+function deleteFile(fileId) {
+    db.collection("files").doc(fileId).delete().then(() => {
+        loadFiles();
+    }).catch((error) => {
+        console.error("Error deleting file:", error);
+    });
 }
 
 function logout() {
