@@ -14,7 +14,7 @@
     </div>
 
     <!-- Hidden login trigger -->
-    <a href="#" id="hidden-link">.</a>
+    <a href="#" id="hidden-link">Hidden Login</a>
 
     <script src="static/script.js"></script>
 </body>
