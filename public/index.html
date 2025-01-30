@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Under Construction</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="message">
+        Site Under Construction<span id="secret">!</span>
+    </div>
+    <div id="login" class="hidden">
+        <h2>Login</h2>
+        <input type="password" id="password" placeholder="Enter password">
+        <button onclick="checkPassword()">Login</button>
+    </div>
+
+    <script>
+        document.getElementById("secret").addEventListener("dblclick", function() {
+            document.getElementById("message").style.display = "none";
+            document.getElementById("login").classList.remove("hidden");
+        });
+
+        function checkPassword() {
+            const password = document.getElementById("password").value;
+            if (password === "your_secure_password") { 
+                window.location.href = "dashboard.html";
+            } else {
+                alert("Incorrect password!");
+            }
+        }
+    </script>
+</body>
+</html>
