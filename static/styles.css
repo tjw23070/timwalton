@@ -12,12 +12,12 @@ body {
 }
 
 #hidden-link {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    width: 50px; /* Increases clickable area */
-    height: 20px;
-    color: transparent; /* Makes text invisible */
-    text-decoration: none;
-    background-color: rgba(255, 255, 255, 0.01); /* Almost invisible */
+    color: inherit; /* Matches surrounding text */
+    text-decoration: none; /* Removes underline */
+    cursor: pointer; /* Shows pointer on hover */
 }
+
+#hidden-link:hover {
+    color: #f39c12; /* Slight color change on hover */
+}
+
