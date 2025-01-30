@@ -25,7 +25,8 @@
             const validPass = "password123";
 
             if (username === validUser && password === validPass) {
-                localStorage.setItem("loggedIn", "true"); // Store login status
+                localStorage.setItem("loggedIn", "true");
+                localStorage.setItem("userId", username);
                 window.location.href = "../dashboard/index.html";
             } else {
                 document.getElementById("error-message").innerText = "Invalid credentials!";
