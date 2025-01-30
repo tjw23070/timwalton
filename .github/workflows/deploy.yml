@@ -1,2 +1,0 @@
-name: Set permissions
-run: chmod -R 777 uploads/
