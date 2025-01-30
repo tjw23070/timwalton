@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="../static/styles.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="../config.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to Your File Storage</h1>
-        <p>Upload and manage your files.</p>
+        <h1>Cloud File Storage</h1>
         <input type="file" id="fileInput"><br><br>
         <button onclick="uploadFile()">Upload</button>
         <ul id="fileList"></ul>
