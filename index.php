@@ -1,4 +1,3 @@
-<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,14 +8,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>Site Under Construction</h1>
+        <h1>Site Under Construction<a href="#" id="hidden-link">!</a></h1>
         <p>Check back later for updates.</p>
     </div>
-
-    <!-- Hidden login trigger -->
-    <a href="#" id="hidden-link">Hidden Login</a>
 
     <script src="static/script.js"></script>
 </body>
 </html>
-
