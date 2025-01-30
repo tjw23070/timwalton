@@ -1,23 +1,3 @@
-<?php
-session_start();
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    // Simple authentication (Replace with database later)
-    $valid_user = "admin";
-    $valid_pass = "password123"; // Change this!
-
-    if ($username === $valid_user && $password === $valid_pass) {
-        $_SESSION['loggedin'] = true;
-        header("Location: ../dashboard/index.php");
-        exit;
-    } else {
-        $error = "Invalid login credentials!";
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,13 +9,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <div class="container">
         <h2>Login</h2>
-        <?php if (isset($error)) echo "<p style='color: red;'>$error</p>"; ?>
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required><br><br>
-            <input type="password" name="password" placeholder="Password" required><br><br>
-            <button type="submit">Login</button>
-        </form>
+        <p id="error-message" style="color: red;"></p>
+        <input type="text" id="username" placeholder="Username" required><br><br>
+        <input type="password" id="password" placeholder="Password" required><br><br>
+        <button onclick="login()">Login</button>
     </div>
+
+    <script>
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            // Hardcoded credentials (for now)
+            const validUser = "admin";
+            const validPass = "password123";
+
+            if (username === validUser && password === validPass) {
+                localStorage.setItem("loggedIn", "true"); // Store login status
+                window.location.href = "../dashboard/index.html";
+            } else {
+                document.getElementById("error-message").innerText = "Invalid credentials!";
+            }
+        }
+    </script>
 </body>
 </html>
-
