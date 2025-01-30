@@ -1,8 +1,0 @@
-# Disable Directory Listing
-Options -Indexes
-
-# Redirect all unauthorized access to index
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(dashboard|auth|uploads) /index.php [L,R=403]
-
