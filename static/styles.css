@@ -12,12 +12,11 @@ body {
 }
 
 #hidden-link {
-    color: inherit; /* Matches surrounding text */
-    text-decoration: none; /* Removes underline */
-    cursor: pointer; /* Shows pointer on hover */
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 #hidden-link:hover {
-    color: #f39c12; /* Slight color change on hover */
+    color: #f39c12;
 }
-
