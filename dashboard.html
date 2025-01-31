@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Storage</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        input, button {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Upload and View Files</h2>
+    <input type="file" id="fileInput">
+    <button onclick="uploadFile()">Upload</button>
+    <h3>Files:</h3>
+    <ul id="fileList"></ul>
+
+    <script>
+        // Firebase Configuration (Replace with your own)
+        const firebaseConfig = {
+  apiKey: "AIzaSyBCfkxWYFn5exq5fhdePGKvymsLZevoqHo",
+  authDomain: "storage-13e02.firebaseapp.com",
+  projectId: "storage-13e02",
+  storageBucket: "storage-13e02.firebasestorage.app",
+  messagingSenderId: "501311603008",
+  appId: "1:501311603008:web:e17953cf00537751743aa5"
+};
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+
+        // Upload File
+        function uploadFile() {
+            const file = document.getElementById("fileInput").files[0];
+            if (!file) {
+                alert("Please select a file.");
+                return;
+            }
+            const storageRef = storage.ref("uploads/" + file.name);
+            storageRef.put(file).then(() => {
+                alert("File uploaded successfully!");
+                listFiles();
+            });
+        }
+
+        // List Files
+        function listFiles() {
+            const fileList = document.getElementById("fileList");
+            fileList.innerHTML = "";
+            storage.ref("uploads").listAll().then((res) => {
+                res.items.forEach((itemRef) => {
+                    itemRef.getDownloadURL().then((url) => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `<a href="${url}" target="_blank">${itemRef.name}</a>`;
+                        fileList.appendChild(li);
+                    });
+                });
+            });
+        }
+
+        listFiles(); // Load files on page load
+    </script>
+</body>
+</html>
