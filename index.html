@@ -3,48 +3,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Under Construction</title>
+    <title>Personal File Depository</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #121212;
-            color: white;
-            font-family: Arial, sans-serif;
-            font-size: 24px;
-            text-align: center;
+            font-family: 'Inter', sans-serif;
+            /* Charcoal grey background */
+            background-color: #36454F;
+            /* White text color */
+            color: #F3F4F6; /* Tailwind gray-100 for slightly softer white */
         }
-        .hidden {
-            display: none;
+        .hidden { display: none; }
+        .btn {
+            /* Adjusted button for dark theme */
+            @apply py-2 px-4 bg-sky-600 text-white font-semibold rounded-lg shadow-md hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-75 transition duration-150 ease-in-out disabled:opacity-50;
         }
+        .btn-danger {
+            /* Adjusted danger button for dark theme */
+            @apply bg-red-600 hover:bg-red-700 focus:ring-red-500;
+        }
+        .input-field {
+            /* Adjusted input field for dark theme */
+            @apply mt-1 block w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-sm shadow-sm placeholder-gray-400 text-gray-50 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500;
+        }
+        .file-item {
+            /* Adjusted file item for dark theme */
+            @apply p-3 mb-2 bg-gray-700 rounded-md shadow flex justify-between items-center hover:bg-gray-600 transition-colors;
+        }
+        .file-item span {
+            @apply truncate mr-2 text-gray-100;
+        }
+        #constructionExclamation {
+            cursor: pointer;
+            font-weight: bold;
+            /* color will inherit from body or h1 */
+        }
+        .modal {
+            @apply fixed inset-0 bg-black bg-opacity-75 overflow-y-auto h-full w-full flex items-center justify-center z-50; /* Darker overlay */
+        }
+        .modal-content {
+            /* Adjusted modal content for dark theme */
+            @apply bg-gray-800 p-6 rounded-lg shadow-xl w-full max-w-md text-gray-100;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.2); /* Lighter border for dark theme */
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #0EA5E9; /* sky-500 */
+            animation: spin 1s ease infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #confirmationModal .modal-content {
+            @apply max-w-sm;
+        }
+
+        /* Specific text color adjustments where needed */
+        .text-primary-darktheme { @apply text-gray-100; }
+        .text-secondary-darktheme { @apply text-gray-300; }
+        .text-muted-darktheme { @apply text-gray-400; }
+
     </style>
 </head>
-<body>
-    <div id="message">
-        Site Under Construction<span id="secret">!</span>
-    </div>
-    <div id="login" class="hidden">
-        <h2>Login</h2>
-        <input type="password" id="password" placeholder="Enter password">
-        <button onclick="checkPassword()">Login</button>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div id="appContainer" class="w-full max-w-2xl bg-gray-800 p-8 rounded-xl shadow-2xl">
+        <div id="constructionMessage" class="text-center">
+            <h1 class="text-3xl font-bold text-gray-100"> Site Under Construction<span id="constructionExclamation" title="Login">!</span>
+            </h1>
+        </div>
+
+        <div id="loginModal" class="modal hidden">
+            <div class="modal-content"> <h2 class="text-2xl font-semibold mb-6 text-center text-gray-100">Login</h2>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label for="username" class="block text-sm font-medium text-gray-300">Username</label>
+                        <input type="text" id="username" name="username" class="input-field" required value="admin">
+                    </div>
+                    <div class="mb-6">
+                        <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+                        <input type="password" id="password" name="password" class="input-field" required value="password123">
+                    </div>
+                    <button type="submit" class="btn w-full">Login</button>
+                    <p id="loginError" class="text-red-400 text-sm mt-2 text-center"></p> <button type="button" id="closeLoginModal" class="mt-4 w-full py-2 px-4 bg-gray-600 text-gray-200 font-semibold rounded-lg hover:bg-gray-500 transition duration-150 ease-in-out">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="fileManagementSection" class="hidden mt-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-100">File Depository</h2>
+                <button id="logoutButton" class="btn btn-danger">Logout</button>
+            </div>
+
+            <div id="userInfo" class="mb-4 p-3 bg-gray-700 rounded-md text-sky-300 text-sm"> Logged in as: <span id="loggedInUser" class="font-semibold">admin</span><br> User ID: <span id="currentUserId" class="font-mono text-xs break-all text-sky-400"></span>
+            </div>
+
+            <div class="mb-8 p-6 bg-gray-700 rounded-lg shadow"> <h3 class="text-xl font-medium mb-4 text-gray-200">Upload New File</h3>
+                <input type="file" id="fileInput" class="block w-full text-sm text-gray-400
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-sky-800 file:text-sky-200
+                    hover:file:bg-sky-700 mb-2
+                "/> <button id="uploadButton" class="btn mt-2 w-full sm:w-auto">Upload File</button>
+                <p id="uploadStatus" class="text-sm mt-2 text-gray-300"></p> <div id="uploadLoading" class="loading-spinner hidden mx-auto mt-2"></div>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-medium mb-4 text-gray-200">Uploaded Files</h3>
+                <div id="fileList" class="space-y-3">
+                    <p id="noFilesMessage" class="text-gray-400">No files uploaded yet.</p>
+                </div>
+                <div id="filesLoading" class="loading-spinner hidden mx-auto mt-4"></div>
+            </div>
+        </div>
     </div>
 
-    <script>
-        document.getElementById("secret").addEventListener("dblclick", function() {
-            document.getElementById("message").style.display = "none";
-            document.getElementById("login").classList.remove("hidden");
-        });
+    <div id="confirmationModal" class="modal hidden">
+        <div class="modal-content"> <h3 id="confirmationTitle" class="text-lg font-semibold mb-4 text-gray-100">Confirm Action</h3>
+            <p id="confirmationMessage" class="mb-6 text-sm text-gray-300">Are you sure?</p>
+            <div class="flex justify-end space-x-3">
+                <button id="confirmCancelButton" class="btn bg-gray-600 hover:bg-gray-500 text-gray-200">Cancel</button>
+                <button id="confirmActionButton" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
 
-        function checkPassword() {
-            const password = document.getElementById("password").value;
-            if (password === "test1234") { 
-                window.location.href = "dashboard.html";
-            } else {
-                alert("Incorrect password!");
+
+    <script type="module">
+        // Firebase v9+ modular SDK imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+        import {
+            getAuth,
+            signInAnonymously,
+            onAuthStateChanged,
+            signInWithCustomToken
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import {
+            getFirestore,
+            collection,
+            addDoc,
+            doc,
+            onSnapshot,
+            query,
+            deleteDoc,
+            Timestamp,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import {
+            getStorage,
+            ref,
+            uploadBytesResumable,
+            getDownloadURL,
+            deleteObject
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        // --- Firebase Configuration ---
+        // Using the configuration you provided
+        const firebaseConfig = {
+          apiKey: "AIzaSyAP7ZnZqLgRV3XhJsMg1vl6e0wnu6WaZVg",
+          authDomain: "files-52391.firebaseapp.com",
+          projectId: "files-52391",
+          storageBucket: "files-52391.firebasestorage.app", // Using your provided value
+          messagingSenderId: "14939471052",
+          appId: "1:14939471052:web:fdcc08e1994b5fd314d669",
+          measurementId: "G-Y94SYPHL5V"
+        };
+
+        const hostAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-file-depository-app';
+
+        // Initialize Firebase
+        let app;
+        let auth;
+        let db;
+        let storage;
+        let analytics; // For Google Analytics
+        let currentUserId = null;
+        let unsubscribeFiles = null;
+        let isAuthReady = false;
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
+            analytics = getAnalytics(app); // Initialize Analytics
+            setLogLevel('debug');
+            console.log("Firebase initialized successfully (Auth, Firestore, Storage, Analytics). Project ID:", firebaseConfig.projectId);
+        } catch (error) {
+            console.error("Error initializing Firebase:", error);
+            const appContainer = document.getElementById('appContainer');
+            if (appContainer) {
+                appContainer.innerHTML = `
+                    <div class="text-red-400 text-center p-4">
+                        <h2 class="text-xl font-bold text-red-300">Firebase Initialization Error</h2>
+                        <p>Could not connect to the backend. Please ensure your Firebase configuration is correct.</p>
+                        <p class="text-sm mt-2">${error.message}</p>
+                    </div>`;
             }
         }
-    </script>
-</body>
-</html>
+
+        // --- DOM Elements ---
+        const constructionMessageEl = document.getElementById('constructionMessage');
+        const constructionExclamationEl = document.getElementById('constructionExclamation');
+        const loginModalEl = document.getElementById('loginModal');
+        const loginFormEl = document.getElementById('loginForm');
+        const closeLoginModalBtn = document.getElementById('closeLoginModal');
+        const loginErrorEl = document.getElementById('loginError');
+
+        const fileManagementSectionEl = document.getElementById('fileManagementSection');
+        const logoutButtonEl = document.getElementById('logoutButton');
+        const loggedInUserEl = document.getElementById('loggedInUser');
+        const currentUserIdEl = document.getElementById('currentUserId');
+
+        const fileInputEl = document.getElementById('fileInput');
+        const uploadButtonEl = document.getElementById('uploadButton');
+        const uploadStatusEl = document.getElementById('uploadStatus');
+        const uploadLoadingEl = document.getElementById('uploadLoading');
+
+        const fileListEl = document.getElementById('fileList');
+        const noFilesMessageEl = document.getElementById('noFilesMessage');
+        const filesLoadingEl = document.getElementById('filesLoading');
+
+        const confirmationModalEl = document.getElementById('confirmationModal');
+        const confirmationTitleEl = document.getElementById('confirmationTitle');
+        const confirmationMessageEl = document.getElementById('confirmationMessage');
+        const confirmCancelButtonEl = document.getElementById('confirmCancelButton');
+        const confirmActionButtonEl = document.getElementById('confirmActionButton');
+        let confirmActionCallback = null;
+
+
+        // --- UI Helper Functions ---
+        function showConstructionMessage() {
+            constructionMessageEl.classList.remove('hidden');
+            loginModalEl.classList.add('hidden');
+            fileManagementSectionEl.classList.add('hidden');
+            if (unsubscribeFiles) {
+                unsubscribeFiles();
+                unsubscribeFiles = null;
+            }
+        }
+
+        function showLoginModal() {
+            loginModalEl.classList.remove('hidden');
+            loginErrorEl.textContent = '';
+        }
+
+        function showFileManagement() {
+            if (!currentUserId) {
+                console.warn("Attempted to showFileManagement without a currentUserId.");
+                sessionStorage.removeItem('isUserLoggedInViaForm');
+                showConstructionMessage();
+                return;
+            }
+            constructionMessageEl.classList.add('hidden');
+            loginModalEl.classList.add('hidden');
+            fileManagementSectionEl.classList.remove('hidden');
+            currentUserIdEl.textContent = currentUserId;
+            loggedInUserEl.textContent = loginFormEl.username.value || "admin";
+
+            fetchAndDisplayFiles();
+        }
+
+        function openConfirmationModal(title, message, onConfirm) {
+            confirmationTitleEl.textContent = title;
+            confirmationMessageEl.textContent = message;
+            confirmActionCallback = onConfirm;
+            confirmationModalEl.classList.remove('hidden');
+        }
+
+        function closeConfirmationModal() {
+            confirmationModalEl.classList.add('hidden');
+            confirmActionCallback = null;
+        }
+
+        confirmCancelButtonEl.addEventListener('click', closeConfirmationModal);
+        confirmActionButtonEl.addEventListener('click', () => {
+            if (confirmActionCallback) {
+                confirmActionCallback();
+            }
+            closeConfirmationModal();
+        });
+
+
+        // --- Authentication ---
+        onAuthStateChanged(auth, async (user) => {
+            isAuthReady = true; // Mark auth check as complete regardless of outcome here
+            if (user) {
+                currentUserId = user.uid;
+                console.log("onAuthStateChanged: User is signed in:", currentUserId, "for project:", firebaseConfig.projectId);
+                if (sessionStorage.getItem('isUserLoggedInViaForm') === 'true') {
+                    showFileManagement();
+                } else {
+                    // User is authenticated with Firebase, but not "form logged in"
+                    showConstructionMessage();
+                }
+            } else {
+                currentUserId = null;
+                console.log("onAuthStateChanged: User is signed out for project:", firebaseConfig.projectId);
+                sessionStorage.removeItem('isUserLoggedInViaForm');
+                showConstructionMessage();
+            }
+        });
+
+        async function initializeAuth() {
+            if (!auth) {
+                console.error("Firebase Auth is not initialized for initializeAuth call.");
+                isAuthReady = true; // Still set to true to allow UI to settle
+                showConstructionMessage(); // Show construction if auth is not available
+                return;
+            }
+            try {
+                // Check if __initial_auth_token is provided (e.g., by Canvas environment)
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    console.log("Attempting to sign in with custom token for project:", firebaseConfig.projectId);
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                    console.log("Successfully signed in with custom token.");
+                } else if (!auth.currentUser) {
+                    // If no custom token and no user is currently signed in, attempt anonymous sign-in
+                    console.log("No custom token and no current user, attempting to sign in anonymously for project:", firebaseConfig.projectId);
+                    await signInAnonymously(auth);
+                    console.log("Anonymous sign-in attempt completed.");
+                } else {
+                    // User is already signed in (e.g., from a previous session or successful custom token)
+                    console.log("User already signed in (UID:", auth.currentUser.uid, ") or custom token not provided. No immediate sign-in action needed by initializeAuth.");
+                }
+            } catch (error) {
+                console.warn("Initial sign-in attempt (custom token or other) failed:", error.code, error.message);
+                // If custom token sign-in failed (e.g., auth/custom-token-mismatch, which means the token is for a different Firebase project)
+                // and there's still no current user, explicitly attempt anonymous sign-in for THIS project.
+                if (error.code === "auth/custom-token-mismatch" && !auth.currentUser) {
+                    try {
+                        console.log("Custom token mismatch. Falling back to anonymous sign-in for project:", firebaseConfig.projectId);
+                        await signInAnonymously(auth);
+                        console.log("Anonymous sign-in fallback attempt completed after custom token mismatch.");
+                    } catch (anonError) {
+                        console.error("Anonymous sign-in fallback also failed:", anonError.code, anonError.message);
+                        if (loginErrorEl) loginErrorEl.textContent = "Authentication failed. Please refresh.";
+                        const appContainer = document.getElementById('appContainer');
+                        if (appContainer && !appContainer.innerHTML.includes("Firebase Initialization Error") && !appContainer.innerHTML.includes("Critical Error")) {
+                            appContainer.innerHTML = `<div class="text-red-400 text-center p-4"><h2 class="text-xl font-bold text-red-300">Authentication Error</h2><p>Could not authenticate with the service. Please refresh the page.</p></div>`;
+                        }
+                    }
+                } else if (!auth.currentUser) {
+                    // For other errors during initial auth, if no user, log and potentially inform user
+                     console.error("General error during initial auth and no user present:", error.code, error.message);
+                     if (loginErrorEl) loginErrorEl.textContent = "Authentication error. Please refresh.";
+                }
+            } finally {
+                isAuthReady = true; // Ensure auth process is marked as attempted
+                // onAuthStateChanged will handle UI updates based on the final auth state.
+                // This check is to ensure UI consistency if a "form login" was already performed.
+                if (auth.currentUser && sessionStorage.getItem('isUserLoggedInViaForm') === 'true') {
+                    if (!currentUserId) currentUserId = auth.currentUser.uid;
+                    if (fileManagementSectionEl.classList.contains('hidden')) {
+                        showFileManagement();
+                    }
+                } else if (!auth.currentUser && !constructionMessageEl.classList.contains('hidden')) {
+                    // If no user and construction message is not shown, show it.
+                    // This handles cases where auth might have failed silently and
